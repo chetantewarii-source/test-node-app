@@ -4,7 +4,7 @@ const app = express();
 const PORT = 3000;
 
 app.get("/", (req, res) => {
-  res.send("Hello from Node App deployed via Jenkins + Kubernetes!");
+  res.send("Hello from Node App deployed via Jenkins + Kubernetes!!");
 });
 
 app.listen(PORT, () => {
