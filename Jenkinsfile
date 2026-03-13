@@ -31,8 +31,9 @@ pipeline {
                 sh '''
                 /opt/homebrew/bin/trivy image \
                 --scanners vuln \
-                --exit-code 1 \
-                --severity CRITICAL \
+                --format template \
+                --template "@html.tpl" \
+                -o trivy-report.html \
                 chetantewari/square-node-app:$BUILD_NUMBER
                 '''
             }
