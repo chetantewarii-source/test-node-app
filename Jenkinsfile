@@ -12,8 +12,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                /usr/local/bin/docker docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER .
-                /usr/local/bin/docker docker tag $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER $DOCKERHUB_USER/$IMAGE_NAME:latest
+                /usr/local/bin/docker build -t $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER .
+                /usr/local/bin/docker tag $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER $DOCKERHUB_USER/$IMAGE_NAME:latest
                 '''
             }
         }
@@ -29,8 +29,8 @@ pipeline {
         stage('Push Image') {
             steps {
                 sh '''
-                /usr/local/bin/docker docker push $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER
-                /usr/local/bin/docker docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
+                /usr/local/bin/docker push $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER
+                /usr/local/bin/docker push $DOCKERHUB_USER/$IMAGE_NAME:latest
                 '''
             }
         }
