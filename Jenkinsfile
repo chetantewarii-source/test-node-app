@@ -32,7 +32,7 @@ pipeline {
                 /opt/homebrew/bin/trivy image \
                 --exit-code 1 \
                 --severity HIGH,CRITICAL \
-                $DOCKER_USER/$IMAGE_NAME:$BUILD_NUMBER
+                chetantewari/square-node-app:$BUILD_NUMBER
                 '''
             }
         }
