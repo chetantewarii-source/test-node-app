@@ -1,12 +1,10 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Trivy Security Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
@@ -30,21 +28,22 @@ margin-bottom:20px;
 .dashboard{
 display:flex;
 justify-content:center;
-gap:40px;
+gap:25px;
 margin-bottom:30px;
+flex-wrap:wrap;
 }
 
 .card{
 background:white;
-padding:20px;
+padding:15px;
 border-radius:8px;
 box-shadow:0px 2px 6px rgba(0,0,0,0.2);
 text-align:center;
-width:200px;
+width:150px;
 }
 
 .count{
-font-size:32px;
+font-size:30px;
 font-weight:bold;
 }
 
@@ -75,18 +74,20 @@ tr:nth-child(even){
 background:#f2f2f2;
 }
 
-.severity{
+.sev-badge{
+padding:5px 10px;
+border-radius:5px;
 font-weight:bold;
-text-align:center;
+color:white;
 }
 
-.severity-LOW{background:#27ae6040;}
-.severity-MEDIUM{background:#f1c40f40;}
-.severity-HIGH{background:#e67e2240;}
-.severity-CRITICAL{background:#e74c3c40;}
+.CRITICAL{background:#e74c3c;}
+.HIGH{background:#e67e22;}
+.MEDIUM{background:#f1c40f;color:black;}
+.LOW{background:#27ae60;}
 
 .reason{
-max-width:500px;
+max-width:450px;
 word-wrap:break-word;
 }
 
@@ -148,8 +149,6 @@ Generated: {{ now }}
 <canvas id="severityChart"></canvas>
 </div>
 
-<br>
-
 <button onclick="downloadPDF()">Download PDF Report</button>
 
 <table>
@@ -167,13 +166,17 @@ Generated: {{ now }}
 {{- range . }}
 {{- range .Vulnerabilities }}
 
-<tr class="severity-{{ escapeXML .Vulnerability.Severity }}">
+<tr>
 
 <td>{{ escapeXML .PkgName }}</td>
 
 <td>{{ escapeXML .VulnerabilityID }}</td>
 
-<td class="severity">{{ escapeXML .Vulnerability.Severity }}</td>
+<td class="severityCell" data-severity="{{ escapeXML .Vulnerability.Severity }}">
+<span class="sev-badge {{ escapeXML .Vulnerability.Severity }}">
+{{ escapeXML .Vulnerability.Severity }}
+</span>
+</td>
 
 <td>{{ escapeXML .InstalledVersion }}</td>
 
@@ -198,14 +201,16 @@ Generated: {{ now }}
 
 <script>
 
+document.addEventListener("DOMContentLoaded", function(){
+
 let critical=0
 let high=0
 let medium=0
 let low=0
 
-document.querySelectorAll(".severity").forEach(function(el){
+document.querySelectorAll(".severityCell").forEach(function(el){
 
-let sev=el.innerText.trim()
+let sev=el.dataset.severity
 
 if(sev==="CRITICAL"){critical++}
 if(sev==="HIGH"){high++}
@@ -237,7 +242,16 @@ backgroundColor:[
 '#27ae60'
 ]
 }]
+},
+options:{
+plugins:{
+legend:{
+position:'bottom'
 }
+}
+}
+})
+
 })
 
 function downloadPDF(){
@@ -248,11 +262,11 @@ const doc=new jsPDF()
 
 doc.text("Trivy Security Report",20,20)
 
-doc.text("Total Vulnerabilities: "+total,20,40)
-doc.text("Critical: "+critical,20,50)
-doc.text("High: "+high,20,60)
-doc.text("Medium: "+medium,20,70)
-doc.text("Low: "+low,20,80)
+doc.text("Total Vulnerabilities: "+document.getElementById("totalVulns").innerText,20,40)
+doc.text("Critical: "+document.getElementById("criticalCount").innerText,20,50)
+doc.text("High: "+document.getElementById("highCount").innerText,20,60)
+doc.text("Medium: "+document.getElementById("mediumCount").innerText,20,70)
+doc.text("Low: "+document.getElementById("lowCount").innerText,20,80)
 
 doc.save("trivy-report.pdf")
 
