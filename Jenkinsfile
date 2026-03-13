@@ -9,11 +9,11 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git 'https://github.com/chetantewarii-source/test-node-app.git'
-            }
-        }
+        // stage('Checkout Code') {
+        //     steps {
+        //         git 'https://github.com/chetantewarii-source/test-node-app.git'
+        //     }
+        // }
 
         stage('Install Dependencies') {
             steps {
@@ -65,6 +65,14 @@ pipeline {
                 '''
             }
         }
+
+        stage('Cleanup') {
+            steps {
+                sh '''
+                docker rmi $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER || true
+                '''
+    }
+}
 
     }
 }
