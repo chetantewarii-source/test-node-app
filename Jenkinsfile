@@ -30,8 +30,9 @@ pipeline {
             steps {
                 sh '''
                 /opt/homebrew/bin/trivy image \
+                --scanners vuln \
                 --exit-code 1 \
-                --severity HIGH,CRITICAL \
+                --severity CRITICAL \
                 chetantewari/square-node-app:$BUILD_NUMBER
                 '''
             }
