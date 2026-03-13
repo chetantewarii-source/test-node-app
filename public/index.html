@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Square Calculator</title>
+</head>
+
+<body>
+
+<h2>Square Calculator</h2>
+
+<input type="number" id="num" placeholder="Enter number">
+
+<button onclick="calculate()">Calculate</button>
+
+<h3 id="result"></h3>
+
+<script>
+function calculate() {
+
+    const num = document.getElementById("num").value;
+
+    fetch(`/square?num=${num}`)
+        .then(res => res.json())
+        .then(data => {
+
+            if(data.error){
+                document.getElementById("result").innerText = data.error;
+            }else{
+                document.getElementById("result").innerText =
+                "Square is: " + data.square;
+            }
+
+        });
+
+}
+</script>
+
+</body>
+</html>

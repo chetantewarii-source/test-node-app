@@ -1,17 +1,15 @@
 {
-  "name": "demo",
+  "name": "square-node-app",
   "version": "1.0.0",
-  "description": "",
+  "description": "Square calculator web app",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "node test.js"
   },
-  "keywords": [],
-  "author": "chetan",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1"
-  }
+    "express": "^4.19.2"
+  },
+  "author": "chetan",
+  "license": "MIT"
 }

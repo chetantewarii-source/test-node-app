@@ -1,20 +1,40 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: node-app
+# spec:
+#   replicas: 2
+#   selector:
+#     matchLabels:
+#       app: node-app
+#   template:
+#     metadata:
+#       labels:
+#         app: node-app
+#     spec:
+#       containers:
+#       - name: node-app
+#         image: chetantewari/test-node-app:latest
+#         imagePullPolicy: IfNotPresent
+#         ports:
+#         - containerPort: 3000
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-app
+  name: square-node-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
-      app: node-app
+      app: square-node-app
   template:
     metadata:
       labels:
-        app: node-app
+        app: square-node-app
     spec:
       containers:
-      - name: node-app
-        image: chetantewari/test-node-app:latest
-        imagePullPolicy: IfNotPresent
+      - name: square-node-app
+        image: chetantewari/square-node-app:latest
         ports:
         - containerPort: 3000

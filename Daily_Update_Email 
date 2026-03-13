@@ -1,0 +1,103 @@
+properties([
+    parameters([
+        choice(
+            choices: ['Daily-Update-Email'],
+            description: 'Choose service name.',
+            name: 'SERVICE'
+        ),
+        choice(
+            choices: ['prod'],
+            description: 'Choose environment.',
+            name: 'BUILDENVIRONMENT'
+        ),
+        gitParameter(
+            branch: '',
+            branchFilter: '*',
+            defaultValue: 'origin/main',
+            description: 'Choose the tag which need to deploy.',
+            name: 'BRANCH',
+            quickFilterEnabled: true,
+            selectedValue: 'DEFAULT',
+            sortMode: 'DESCENDING_SMART',
+            tagFilter: '1*',
+            useRepository: 'https://gitlab.dotpe.in/data-analytics/analytics-scripts.git',
+            type: 'GitParameterDefinition'
+        ),
+    ])
+])
+
+pipeline {
+
+    agent {
+        label 'slave1'
+    }
+
+    triggers {
+        cron('''
+            00 10 * * *
+        ''')
+    }
+
+    options {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+    }
+
+    stages {
+
+        stage("Set Build Name") {
+            steps {
+                script {
+                    currentBuild.displayName = "$SERVICE-$BUILDENVIRONMENT-$BUILD_NUMBER"
+                    currentBuild.description = "$SERVICE-$BUILDENVIRONMENT-$BUILD_NUMBER"
+                }
+            }
+        }
+
+        stage ('Devops repo pull') {
+            steps {
+                dir('devops') {
+                    git credentialsId: 'devops-read', url: 'https://gitlab.dotpe.in/dotpe-devops/devops.git', branch: "master"
+                }
+            }
+        }
+
+        stage ('Git analytics checkout') {
+            steps {
+                dir('analytics-scripts'){
+                    deleteDir()
+                    checkout([$class: 'GitSCM',
+                    branches: [[name: '$BRANCH']],
+                    userRemoteConfigs: [[
+                        credentialsId: 'devops-read',
+                        url: 'https://gitlab.dotpe.in/data-analytics/analytics-scripts.git'
+                        ]]
+                    ])
+                }
+            }
+        }
+
+        stage ('Image build') {
+            steps {
+                sh'''
+                    IMAGETAG=$SERVICE-$BUILDENVIRONMENT-$BUILD_NUMBER
+                    cd $WORKSPACE/
+                    cp devops/dockerfiles/Daily_Update_Email_Dockerfile  .
+                    cp /home/ubuntu/config/data-analytics/boxwood-mantra-456206-s3-bc70dce6a998.json .
+                    sed -i 's#json_key_path = r"JSON_PATH"#json_key_path = r"boxwood-mantra-456206-s3-bc70dce6a998.json"#' analytics-scripts/Rista_WOW.py
+                    docker build -f Daily_Update_Email_Dockerfile -t daily_update_email:$IMAGETAG .
+                '''
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                IMAGETAG=$SERVICE-$BUILDENVIRONMENT-$BUILD_NUMBER
+                docker run --rm daily_update_email:$IMAGETAG
+                '''
+            }
+        }
+
+    }
+}
