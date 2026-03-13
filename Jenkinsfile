@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    tools {
+        nodejs "node18"
+    }
+
     environment {
         DOCKERHUB_USER = "chetantewari"
         IMAGE_NAME = "square-node-app"
