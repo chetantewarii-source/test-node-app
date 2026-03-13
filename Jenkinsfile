@@ -9,24 +9,6 @@ pipeline {
 
     stages {
 
-        // stage('Checkout Code') {
-        //     steps {
-        //         git 'https://github.com/chetantewarii-source/test-node-app.git'
-        //     }
-        // }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                sh 'npm test'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -39,14 +21,12 @@ pipeline {
         stage('Login to DockerHub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh '''
-                    echo $PASSWORD | docker login -u $USERNAME --password-stdin
-                    '''
+                    sh 'echo $PASSWORD | docker login -u $USERNAME --password-stdin'
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Push Image') {
             steps {
                 sh '''
                 docker push $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER
@@ -65,14 +45,6 @@ pipeline {
                 '''
             }
         }
-
-        stage('Cleanup') {
-            steps {
-                sh '''
-                docker rmi $DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER || true
-                '''
-    }
-}
 
     }
 }
