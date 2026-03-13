@@ -38,10 +38,10 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh '''
-                /usr/local/bin/ kubectl set image deployment/square-node-app \
+                /usr/local/bin/kubectl set image deployment/square-node-app \
                 square-node-app=$DOCKERHUB_USER/$IMAGE_NAME:$BUILD_NUMBER
 
-                /usr/local/bin/ kubectl rollout status deployment/square-node-app
+                /usr/local/bin/kubectl rollout status deployment/square-node-app
                 '''
             }
         }
